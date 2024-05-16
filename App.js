@@ -1,63 +1,73 @@
-const express = require('express');
-const app = express();
-const port = 3000;
-const fs = require('fs');
+const express = require('express')
+const fs = require('fs')
+const app = express()
+const port = 3000
 
-app.use(express.json());
+app.use(express.json())
+// app.use(bodyParser.json())
 
-const data = JSON.parse(fs.readFileSync('data.json'));
+const data = JSON.parse(fs.readFileSync('data.json'))
 
-app.get('/objects', (req, res) => {
+app.get('/', (req, res) => {
   res.json(data);
-});
+})
 
-app.get('/objects/:id', (req, res) => {
+app.post('/', (req, res) => {
+  const a = req.body
+  data.push(a)
+  fs.writeFileSync('data.json', JSON.stringify(data))
+  res.status(201)
+  res.send("Thêm thành công")
+})
+
+app.get('/:id', (req, res) => {
+  // console.log(req.params);
   const id = parseInt(req.params.id);
-  const object = data.find(obj => obj.id === id);
+  const object = data.find((obj) => {
+    if(id == obj.id)
+      return obj
+    else return null
+  });
+  // console.log(object)
   if (object) {
     res.json(object);
   } else {
-    res.status(404).send('Object not found');
+    res.status(404)
   }
 });
 
-app.post('/objects', (req, res) => {
-  const newObject = req.body;
-  // Add validation if needed
-  data.push(newObject);
-  // Write updated data back to JSON file
-  fs.writeFileSync('data.json', JSON.stringify(data));
-  res.status(201).send('Object created successfully');
-});
-
-app.put('/objects/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const updatedObject = req.body;
-  // Find index of object with given ID
-  const index = data.findIndex(obj => obj.id === id);
+app.put('/:id', (req, res)=>{
+  const id = parseInt(req.params.id)
+  const update = req.body
+  const index = data.findIndex((obj)=>{
+    if(id == obj.id)
+      return obj
+    else return null
+  });
   if (index !== -1) {
-    // Update object in data array
-    data[index] = { ...data[index], ...updatedObject };
-    // Write updated data back to JSON file
+    // data.id = update.id
+    // data.title = update.title
+    // data.author = update.author
+    // data.year = update.year
+    data[index] = { ...data[index], ...update };
     fs.writeFileSync('data.json', JSON.stringify(data));
-    res.send('Object updated successfully');
-  } else {
-    res.status(404).send('Object not found');
+    res.send('Sửa thành công');
   }
-});
+})
 
-app.delete('/objects/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  // Find index of object with given ID
-  const index = data.findIndex(obj => obj.id === id);
+app.delete('/:id', (req, res) => {
+  const id = parseInt(req.params.id)
+  const index = data.findIndex((obj)=>{
+    if(id == obj.id)
+      return obj
+    else return null
+  });
   if (index !== -1) {
-    // Remove object from data array
+    
     data.splice(index, 1);
-    // Write updated data back to JSON file
+
     fs.writeFileSync('data.json', JSON.stringify(data));
-    res.send('Object deleted successfully');
-  } else {
-    res.status(404).send('Object not found');
+    res.send('Xóa thành công');
   }
 });
 
