@@ -25,7 +25,8 @@ app.get('/api/users/:id', (req, res) => {
 
 app.post('/api/users', (req, res) => {
   req.body.id = parseInt(data[(data.length)-1].id)+1
-  data.push(req.body)
+  let news = req.body
+  data.push(news)
   fs.writeFileSync('data.json', JSON.stringify(data))
   res.send("Success")
 })
