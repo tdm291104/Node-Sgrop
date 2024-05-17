@@ -17,16 +17,10 @@ app.get('/api/users', (req, res) => {
 })
 app.get('/api/users/:id', (req, res) => {
   const id = parseInt(req.params.id)
-  const object = data.find((obj) => {
-    if(id == obj.id)
-      return obj
-    else return null
+  data.forEach((e) => {
+    if(id == e.id)
+      res.json(e)
     });
-
-    if (object) {
-      res.json(object);
-      
-    }
 })
 
 app.post('/api/users', (req, res) => {
@@ -39,8 +33,8 @@ app.post('/api/users', (req, res) => {
 app.put('/api/users/:id', (req, res) => {
   const id = parseInt(req.params.id)
   const update = req.body
-  data.forEach((element,x) => {
-    if(element.id == id){
+  data.forEach((e,x) => {
+    if(e.id == id){
       data[x].name = update.name
     }
   })
