@@ -8,6 +8,14 @@ app.use(express.json())
 
 const data = JSON.parse(fs.readFileSync('data.json'))
 
+app.use((req, res, next)=>{
+  console.log(">>>> Check new request")
+  console.log("host: ", req.hostname)
+  console.log("path: ", req.path)
+  console.log("method: ", req.method)
+  next()
+})
+
 app.get('/', (req, res) => {
   res.send("Hello World!!!!!!!!")
 })
@@ -15,15 +23,28 @@ app.get('/', (req, res) => {
 app.get('/api/users', (req, res) => {
   res.json(data);
 })
+
 app.get('/api/users/:id', (req, res) => {
-  const id = parseInt(req.params.id)
+  const id = req.params.id
+  let usercheck = false
   data.forEach((e) => {
     if(id == e.id)
       res.json(e)
     });
+  if(!usercheck){
+    res.send("Fail")
+  }
 })
 
-app.post('/api/users', (req, res) => {
+function Checknamereq(req, res, next){
+  const name = req.body.name;
+  if(!name){
+    return res.send("Error");
+  }
+  next()
+}
+
+app.post('/api/users', Checknamereq, (req, res) => {
   req.body.id = parseInt(data[(data.length)-1].id)+1
   data.push(req.body)
   fs.writeFileSync('data.json', JSON.stringify(data))
@@ -31,26 +52,44 @@ app.post('/api/users', (req, res) => {
 })
 
 app.put('/api/users/:id', (req, res) => {
-  const id = parseInt(req.params.id)
+  const id = req.params.id
   const update = req.body
+  let usercheck = false;
   data.forEach((e,x) => {
     if(e.id == id){
       data[x].name = update.name
     }
   })
-  fs.writeFileSync('data.json', JSON.stringify(data))
-  res.send("Susses")
+  if(usercheck){
+    fs.writeFileSync('data.json', JSON.stringify(data))
+    res.send("Susses")
+  }
+  else{
+    res.send("Fail")
+  }
 })
 
 app.delete('/api/users/:id', (req, res) =>{
-  const id = parseInt(req.params.id);
+  const id = req.params.id
+  let usercheck = false;
   data.forEach((e,x)=>{
     if(e.id === id){
       data.splice(x,1)
     }
   })
-  fs.writeFileSync('data.json', JSON.stringify(data))
-  res.send("Susses")
+  if(usercheck){
+    fs.writeFileSync('data.json', JSON.stringify(data))
+    res.send("Susses")
+  }
+  else{
+    res.send("Fail")
+  }
+})
+
+
+
+app.use((req, res)=>{
+  res.send("404 not found")
 })
 
 app.listen(port, () => {
