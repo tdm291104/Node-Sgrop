@@ -30,6 +30,7 @@ app.get('/api/users/:id', (req, res) => {
   data.forEach((e) => {
     if(id == e.id)
       res.json(e)
+      usercheck = true
     });
   if(!usercheck){
     res.send("Fail")
@@ -58,6 +59,7 @@ app.put('/api/users/:id', (req, res) => {
   data.forEach((e,x) => {
     if(e.id == id){
       data[x].name = update.name
+      usercheck = true
     }
   })
   if(usercheck){
@@ -70,10 +72,11 @@ app.put('/api/users/:id', (req, res) => {
 })
 
 app.delete('/api/users/:id', (req, res) =>{
-  const id = req.params.id
+  const id = req.params.id;
   let usercheck = false;
   data.forEach((e,x)=>{
-    if(e.id === id){
+    if(e.id == id){
+      usercheck = true
       data.splice(x,1)
     }
   })
